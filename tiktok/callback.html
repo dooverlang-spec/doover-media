@@ -6,25 +6,28 @@
 <title>두버 업로더 - TikTok 연결</title>
 <style>
   body { font-family: system-ui, sans-serif; max-width: 520px; margin: 40px auto; padding: 0 16px; color: #222; background: #fff; }
-  code { display: block; word-break: break-all; background: #f3f3f3; padding: 12px; border-radius: 8px; }
   .err { color: #b00020; }
 </style>
 </head>
 <body>
 <h1>두버 업로더</h1>
-<div id="out"></div>
+<p id="out">TikTok 연결을 마무리하는 중…</p>
+<script src="app.js"></script>
 <script>
-  var p = new URLSearchParams(location.search);
-  var out = document.getElementById('out');
-  if (p.get('error')) {
-    out.innerHTML = '<p class="err">연결이 취소되었거나 실패했습니다.</p>';
-    out.appendChild(document.createTextNode(p.get('error') + ' ' + (p.get('error_description') || '')));
-  } else if (p.get('code')) {
-    out.innerHTML = '<p>TikTok 연결 허용이 완료되었습니다. 아래 코드는 몇 분 안에 만료됩니다.</p><code id="c"></code>';
-    document.getElementById('c').textContent = p.get('code');
-  } else {
-    out.innerHTML = '<p>두버 일본어 학습 영상을 두버 TikTok 계정에 게시하기 위한 연결 페이지입니다.</p>';
-  }
+(async () => {
+  const p = new URLSearchParams(location.search);
+  const out = document.getElementById('out');
+  const fail = (t) => { out.textContent = t; out.className = 'err'; };
+  let expected = null;
+  try { expected = sessionStorage.getItem('tt_state'); sessionStorage.removeItem('tt_state'); } catch (e) {}
+  if (p.get('error')) return fail('연결이 취소되었거나 실패했습니다: ' + p.get('error'));
+  if (!p.get('code') || !expected || p.get('state') !== expected) return fail('잘못된 요청입니다. 처음 화면에서 다시 시도해 주세요.');
+  try {
+    const { session } = await api('/exchange', { code: p.get('code') });
+    sessionStorage.setItem('tt_session', session);
+    location.replace('./');
+  } catch (e) { fail('연결에 실패했습니다: ' + e.message); }
+})();
 </script>
 </body>
 </html>
