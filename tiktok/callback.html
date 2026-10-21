@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>두버 업로더 - TikTok 연결</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 520px; margin: 40px auto; padding: 0 16px; color: #222; background: #fff; }
+  code { display: block; word-break: break-all; background: #f3f3f3; padding: 12px; border-radius: 8px; }
+  .err { color: #b00020; }
+</style>
+</head>
+<body>
+<h1>두버 업로더</h1>
+<div id="out"></div>
+<script>
+  var p = new URLSearchParams(location.search);
+  var out = document.getElementById('out');
+  if (p.get('error')) {
+    out.innerHTML = '<p class="err">연결이 취소되었거나 실패했습니다.</p>';
+    out.appendChild(document.createTextNode(p.get('error') + ' ' + (p.get('error_description') || '')));
+  } else if (p.get('code')) {
+    out.innerHTML = '<p>TikTok 연결 허용이 완료되었습니다. 아래 코드는 몇 분 안에 만료됩니다.</p><code id="c"></code>';
+    document.getElementById('c').textContent = p.get('code');
+  } else {
+    out.innerHTML = '<p>두버 일본어 학습 영상을 두버 TikTok 계정에 게시하기 위한 연결 페이지입니다.</p>';
+  }
+</script>
+</body>
+</html>
