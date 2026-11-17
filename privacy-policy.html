@@ -17,10 +17,10 @@ table{border-collapse:collapse;width:100%;font-size:.92em}th,td{border:1px solid
 <p><b>앱:</b> 두버 - 일본어 회화·여행 일본어 공부 (Google Play 패키지명·App Store 번들 ID com.doover.japanese)<br>
 <b>개발자(운영자):</b> CHO HONG RAE, 서비스명 두버(Doover)<br>
 <b>문의:</b> doover.lang@gmail.com<br>
-<b>시행일:</b> 2026년 11월 8일<br><b>개정:</b> 2026년 11월 23일 시행 — 아이폰(App Store) 앱 내용 추가</p>
+<b>시행일:</b> 2026년 11월 8일<br><b>개정:</b> 2026년 11월 23일 시행 — 아이폰(App Store) 앱 내용 추가<br><b>개정:</b> 2026년 11월 25일 시행 — 핸즈프리·말해서 채점(마이크·음성 인식) 내용 추가</p>
 </div>
 
-<p>이 개인정보처리방침은 Google Play와 Apple App Store에 개발자 CHO HONG RAE가 게시한 앱 "두버 - 일본어 회화·여행 일본어 공부"(이하 "앱")에 적용됩니다. 운영자는 앱에서 필요한 최소한의 정보만 처리합니다. 회원가입이 없고, 이름·이메일·전화번호·위치·연락처는 받지 않습니다.</p>
+<p>이 개인정보처리방침은 Google Play와 Apple App Store에 개발자 CHO HONG RAE가 게시한 앱 "두버 - 일본어 회화·여행 일본어 공부"(이하 "앱")에 적용됩니다. 운영자는 앱에서 필요한 최소한의 정보만 처리합니다. 회원가입이 없고, 이름·이메일·전화번호·위치·연락처는 받지 않습니다. 목소리 녹음 파일도 만들거나 받지 않습니다.</p>
 
 <h2>1. 처리하는 정보와 목적</h2>
 <table>
@@ -30,9 +30,11 @@ table{border-collapse:collapse;width:100%;font-size:.92em}th,td{border:1px solid
 <tr><td>오류 기록(앱이 멈춘 위치, 기기·OS 정보)</td><td>오류 고치기 (Firebase Crashlytics)</td><td>오류가 났을 때</td></tr>
 <tr><td>추천 코드, 익명 사용자 ID, 추천으로 설치한 친구가 첫 공부를 마친 시각</td><td>친구 추천 보상 (Firebase 익명 로그인·Cloud Firestore, Google Play 설치 리퍼러). Android 앱에서만</td><td>추천 링크로 설치하거나 내 링크를 공유했을 때</td></tr>
 <tr><td>구독 상태(구독 여부·상품·주문 정보)</td><td>구독 기능 열기 (Android: Google Play 결제, iPhone: Apple App Store 결제)</td><td>구독할 때. 카드 번호 등 결제 수단은 Google 또는 Apple만 처리하며 운영자는 받지 않습니다</td></tr>
+<tr><td>말한 목소리(마이크 입력)</td><td>말한 답을 글자로 바꿔 채점하기 (기기의 음성 인식 기능, Android는 보통 Google 음성 인식). 운영자에게는 녹음도 인식된 글자도 전송되지 않으며, 통계에는 점수와 "인식됨/안 됨"만 남습니다</td><td>핸즈프리 모드나 말해서 채점을 켜고 마이크 권한을 허용했을 때만</td></tr>
 <tr><td>문의 메일 주소와 내용</td><td>문의·환불 답변</td><td>메일로 문의할 때</td></tr>
 </table>
 <p>학습 기록, 복습 일정, 별표, 설정(알림 시각 등)은 이용자의 기기에만 저장되고 운영자에게 전송되지 않습니다. 알림은 기기 안에서 예약됩니다.</p>
+<p><b>마이크와 음성 인식:</b> 핸즈프리 모드와 말해서 채점은 선택 기능이며, 처음 쓸 때 마이크 권한을 묻습니다. 듣는 동안(한 번에 최대 약 10초)만 마이크를 쓰고, 앱은 녹음 파일을 만들거나 저장하지 않습니다. 목소리는 기기에 설치된 음성 인식 서비스(Android에서는 보통 Google, iPhone에서는 Apple)가 글자로 바꾸며, 기기나 설정에 따라 그 서비스의 서버에서 처리될 수 있습니다. 앱은 바뀐 글자를 채점에만 쓰고 바로 버리며, 운영자에게 보내지 않습니다. 마이크 권한은 기기 설정 › 애플리케이션 › 두버 › 권한에서 언제든 끌 수 있고, 꺼도 다른 공부 기능은 그대로 쓸 수 있습니다.</p>
 
 <h2>2. 처리 위탁과 국외 이전</h2>
 <p>위 정보는 아래 업체가 처리하며, 앱을 쓸 때 네트워크를 통해 미국 등 Google의 서버로 전송됩니다.</p>
@@ -42,6 +44,7 @@ table{border-collapse:collapse;width:100%;font-size:.92em}th,td{border:1px solid
 <tr><td>Google LLC (Firebase Analytics)</td><td>사용 통계</td><td>미국</td><td>14개월 뒤 자동 삭제</td></tr>
 <tr><td>Google LLC (Firebase Crashlytics)</td><td>오류 기록</td><td>미국</td><td>90일 뒤 자동 삭제</td></tr>
 <tr><td>Google LLC (Firebase 인증·Cloud Firestore)</td><td>친구 추천 기록</td><td>미국</td><td>삭제 요청 또는 추천 기능 종료까지</td></tr>
+<tr><td>Google LLC (기기 음성 인식, Android)</td><td>말한 답을 글자로 바꾸기 (핸즈프리·말해서 채점을 쓸 때만)</td><td>미국 등</td><td>Google 정책에 따름 (앱과 운영자는 보관하지 않음)</td></tr>
 <tr><td>Google LLC (Google Play)</td><td>결제·환불·설치 정보 (Android)</td><td>미국</td><td>Google 정책에 따름</td></tr>
 <tr><td>Apple Inc. (App Store)</td><td>결제·환불 정보 (iPhone)</td><td>미국</td><td>Apple 정책에 따름</td></tr>
 </table>
