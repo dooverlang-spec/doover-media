@@ -4,12 +4,116 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>두버 업로더</title>
-<style>body { font-family: system-ui, sans-serif; max-width: 520px; margin: 40px auto; padding: 0 16px; color: #222; background: #fff; }</style>
+<style>
+  :root { --fg: #1d1d1f; --muted: #6e6e73; --line: #e5e5ea; --bg: #fff; --card: #f7f7f9; --accent: #fe2c55; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, sans-serif; max-width: 560px; margin: 32px auto; padding: 0 16px; color: var(--fg); background: var(--bg); line-height: 1.55; }
+  h1 { margin: 0 0 4px; font-size: 24px; }
+  .muted { color: var(--muted); font-size: 14px; }
+  button { font: inherit; border: 0; border-radius: 10px; padding: 12px 18px; cursor: pointer; }
+  .primary { background: #000; color: #fff; width: 100%; font-weight: 600; }
+  .send { background: var(--accent); color: #fff; font-weight: 600; }
+  button:disabled { opacity: .5; cursor: default; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin: 16px 0; }
+  .me { display: flex; align-items: center; gap: 12px; }
+  .me img { width: 48px; height: 48px; border-radius: 50%; }
+  video { width: 100%; max-height: 420px; border-radius: 10px; background: #000; }
+  .row { display: flex; gap: 8px; align-items: center; justify-content: space-between; margin-top: 10px; flex-wrap: wrap; }
+  .status { font-size: 14px; }
+  .err { color: #b00020; }
+  footer { margin-top: 32px; font-size: 13px; color: var(--muted); }
+  footer a { color: inherit; }
+</style>
 </head>
 <body>
 <h1>두버 업로더</h1>
-<p>두버(Doover) 일본어 회화 앱 팀이 직접 만든 짧은 일본어 학습 영상과 퀴즈를 두버 공식 TikTok 계정에 게시하는 도구입니다.</p>
-<p>Doover Uploader posts short Japanese-learning videos and quizzes made by the Doover team to the official Doover TikTok account.</p>
-<p><a href="https://play.google.com/store/apps/details?id=com.doover.japanese">Google Play에서 두버 보기</a> · <a href="privacy.html">개인정보처리방침</a> · <a href="terms.html">이용약관</a></p>
+<p class="muted">두버(Doover) 일본어 회화 앱 팀이 직접 만든 짧은 일본어 학습 영상과 퀴즈를 두버 공식 TikTok 계정에 보내는 도구입니다. 영상은 TikTok 받은편지함에 초안으로 들어가고, 계정 주인이 TikTok 앱에서 확인한 뒤 게시합니다.</p>
+<p class="muted">Doover Uploader sends short Japanese-learning videos made by the Doover team to the official Doover TikTok account's inbox as drafts. The account owner reviews and publishes them in the TikTok app.</p>
+
+<div id="login" class="card" hidden>
+  <button class="primary" id="loginBtn">Continue with TikTok</button>
+  <p class="muted" style="margin:10px 0 0">기본 프로필(이름, 사진) 확인과 영상 초안 업로드 권한을 요청합니다.</p>
+</div>
+
+<div id="me" class="card me" hidden></div>
+<div id="videos"></div>
+<p id="msg" class="status"></p>
+
+<footer>
+  <a href="https://play.google.com/store/apps/details?id=com.doover.japanese">Google Play에서 두버 보기</a> ·
+  <a href="privacy.html">개인정보처리방침</a> · <a href="terms.html">이용약관</a>
+</footer>
+
+<script src="app.js"></script>
+<script>
+const $ = (id) => document.getElementById(id);
+const msg = (t, err) => { $('msg').textContent = t; $('msg').className = 'status' + (err ? ' err' : ''); };
+
+async function login() {
+  const cfg = await api('/config');
+  const state = crypto.getRandomValues(new Uint32Array(4)).join('');
+  try { sessionStorage.setItem('tt_state', state); } catch (e) {}
+  location.href = 'https://www.tiktok.com/v2/auth/authorize/?' + new URLSearchParams({
+    client_key: cfg.client_key, scope: cfg.scope, response_type: 'code',
+    redirect_uri: cfg.redirect_uri, state,
+  });
+}
+
+async function poll(id, el) {
+  for (let i = 0; i < 30; i++) {
+    const s = await api('/status', { publish_id: id });
+    if (s.status === 'SEND_TO_USER_INBOX' || s.status === 'PUBLISH_COMPLETE') {
+      el.textContent = '✅ TikTok 받은편지함으로 보냈어요. TikTok 앱 알림에서 편집 후 게시하세요.';
+      return;
+    }
+    if (s.status === 'FAILED') { el.textContent = '실패: ' + (s.fail_reason || ''); el.className = 'status err'; return; }
+    el.textContent = '처리 중… (' + s.status + ')';
+    await new Promise((r) => setTimeout(r, 3000));
+  }
+}
+
+async function showVideos() {
+  const list = await (await fetch('videos.json', { cache: 'no-store' })).json();
+  for (const v of list) {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = '<strong></strong><video controls playsinline preload="metadata"></video>' +
+      '<p class="muted cap"></p><div class="row"><span class="status"></span>' +
+      '<button class="send">Send to TikTok</button></div>';
+    card.querySelector('strong').textContent = v.title;
+    card.querySelector('video').src = v.url;
+    card.querySelector('.cap').textContent = '캡션: ' + v.caption;
+    const btn = card.querySelector('button');
+    const st = card.querySelector('.status');
+    btn.onclick = async () => {
+      btn.disabled = true; st.className = 'status'; st.textContent = '업로드 중…';
+      try {
+        const { publish_id } = await api('/send', { video_url: v.url });
+        await poll(publish_id, st);
+      } catch (e) { st.textContent = '실패: ' + e.message; st.className = 'status err'; btn.disabled = false; }
+    };
+    $('videos').appendChild(card);
+  }
+}
+
+$('loginBtn').onclick = () => login().catch((e) => msg('로그인을 시작하지 못했어요: ' + e.message, true));
+
+(async () => {
+  if (!session()) { $('login').hidden = false; return; }
+  try {
+    const me = await api('/me');
+    const img = document.createElement('img'); img.src = me.avatar_url; img.alt = '';
+    const box = document.createElement('div');
+    box.innerHTML = '<div class="muted">연결된 TikTok 계정</div><strong></strong>';
+    box.querySelector('strong').textContent = me.display_name;
+    $('me').append(img, box); $('me').hidden = false;
+    await showVideos();
+  } catch (e) {
+    try { sessionStorage.removeItem('tt_session'); } catch (_) {}
+    $('login').hidden = false;
+    msg('다시 로그인해 주세요. (' + e.message + ')', true);
+  }
+})();
+</script>
 </body>
 </html>
